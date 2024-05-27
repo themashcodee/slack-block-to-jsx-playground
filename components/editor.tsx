@@ -96,8 +96,316 @@ const example1: Block[] = [
 	},
 ]
 
+const blocks2: Block[] = [
+	{
+		"type": "rich_text",
+		"elements": [
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "text",
+						"text": "This is my friend ",
+						style: {
+							bold: true,
+							code: true,
+							italic: true,
+							strike: true,
+						},
+					},
+					{
+						"type": "user",
+						"user_id": "U060JP64TQF",
+						style: {
+							"bold": true,
+							"italic": true,
+							"strike": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": ".",
+					},
+				],
+			},
+		],
+	},
+	{
+		"type": "rich_text",
+		"block_id": "9xF+h",
+		"elements": [
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "text",
+						"text": "This is a rich text section with regular text. ",
+					},
+					{
+						"type": "text",
+						"text": "This is bold",
+						"style": {
+							"bold": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": ". ",
+					},
+					{
+						"type": "text",
+						"text": "This is italics.",
+						"style": {
+							"italic": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": " ",
+						"style": {
+							"bold": true,
+							"italic": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": "This is strikethrough.",
+						"style": {
+							"strike": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": " ",
+					},
+					{
+						"type": "text",
+						"text": "This is code.",
+						"style": {
+							"code": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": "\n\n",
+					},
+				],
+			},
+			{
+				"type": "rich_text_list",
+				"elements": [
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "This is an",
+							},
+						],
+					},
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "ordered",
+							},
+						],
+					},
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "list",
+							},
+						],
+					},
+				],
+				"style": "ordered",
+				"indent": 0,
+				"border": 0,
+			},
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "text",
+						"text": "\n",
+					},
+				],
+			},
+			{
+				"type": "rich_text_list",
+				"elements": [
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "This is an",
+							},
+						],
+					},
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "unordered",
+							},
+						],
+					},
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "list",
+							},
+						],
+					},
+				],
+				"style": "bullet",
+				"indent": 8,
+				"border": 1,
+			},
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "text",
+						"text": "\n",
+					},
+				],
+			},
+			{
+				"type": "rich_text_quote",
+				"elements": [
+					{
+						"type": "text",
+						"text": "This is a \ntext quote",
+					},
+				],
+			},
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "text",
+						"text": "\n",
+					},
+				],
+			},
+			{
+				"type": "rich_text_preformatted",
+				"elements": [
+					{
+						"type": "text",
+						"text": "This is a\nmulti-line \ncode block",
+					},
+				],
+				"border": 1,
+			},
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "text",
+						"text": "\nThis is a ",
+					},
+					{
+						"type": "link",
+						"url": "https://www.google.com/",
+						"text": "link",
+					},
+					{
+						"type": "text",
+						"text": " to google.\n\n",
+					},
+				],
+			},
+			{
+				"type": "rich_text_list",
+				"elements": [
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text":
+									"We should also support nested styling like this bolded text",
+								"style": {
+									"bold": true,
+								},
+							},
+						],
+					},
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "in an unordered list",
+								"style": {
+									"bold": true,
+								},
+							},
+						],
+					},
+					{
+						"type": "rich_text_section",
+						"elements": [
+							{
+								"type": "text",
+								"text": "on a text quote.",
+								"style": {
+									"bold": true,
+								},
+							},
+						],
+					},
+				],
+				"style": "bullet",
+				"indent": 0,
+				"border": 1,
+			},
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "text",
+						"text": "Or this ",
+					},
+					{
+						"type": "text",
+						"text": "bolded",
+						"style": {
+							"bold": true,
+							"code": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": " code",
+						"style": {
+							"code": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": ".\n\n\n\nAnd preserve whitespace/newlines?",
+					},
+				],
+			},
+		],
+	},
+]
+
+const example = [...blocks2]
+
 export const Editor = () => {
-	const [blocks, setBlocks] = useState<Block[]>(example1)
+	const [blocks, setBlocks] = useState<Block[]>(example)
 	const [code, setCode] = useState(JSON.stringify(blocks, null, 2))
 	const editorRef = useRef(null)
 
@@ -200,6 +508,36 @@ export const Editor = () => {
 									time={new Date()}
 									showBlockKitDebug
 									blocks={blocks}
+									data={{
+										channels: [
+											{
+												id: "C01HP7H5HME",
+												name: "general",
+											},
+											{
+												id: "C01HP7H61PS",
+												name: "leadership-feedback",
+											},
+										],
+										users: [
+											{
+												id: "U02E1L6UXC5",
+												name: "Amanda",
+											},
+											{
+												id: "U06DVC13S1H",
+												name: "Matt",
+											},
+											{
+												id: "U0649LT5ME2",
+												name: "Michael",
+											},
+											{
+												id: "U060JP64TQF",
+												name: "Mash Codee",
+											},
+										],
+									}}
 								/>
 							</ErrorBoundary>
 						</div>
