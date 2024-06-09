@@ -463,8 +463,8 @@ export const Editor = () => {
 	}
 
 	return (
-		<div className="w-full h-screen overflow-auto bg-[#eef2f5] gap-4">
-			<div className="p-6 flex flex-col gap-4 h-full w-full">
+		<div className="w-full">
+			<div className="p-6 flex flex-col gap-4 w-full">
 				<header className="lg:h-16 shrink-0 bg-white rounded-xl w-full flex flex-col lg:flex-row items-center justify-between px-4 py-4">
 					<div className="flex items-center gap-2">
 						<p className="text-2xl">🧪</p>
@@ -524,8 +524,8 @@ export const Editor = () => {
 					</div>
 				</header>
 
-				<div className="w-full h-full grid lg:grid-cols-7 grid-cols-1 gap-6">
-					<div className="lg:col-span-3 h-full w-full">
+				<div className="w-full max-h-max grid lg:grid-cols-7 grid-cols-1 gap-6">
+					<div className="lg:col-span-3 w-full">
 						<div className="bg-white rounded-xl p-4 shadow-sm border w-full h-full">
 							<ErrorBoundary
 								fallback={
@@ -607,8 +607,8 @@ export const Editor = () => {
 						</div>
 					</div>
 
-					<div className="lg:col-span-4 h-full w-full">
-						<div className="w-full h-full rounded-xl bg-white border shadow-sm p-4">
+					<div className="lg:col-span-4 w-full max-h-[600px] h-full">
+						<div className="w-full rounded-xl bg-white border h-full shadow-sm p-4">
 							<div className="w-full rounded-lg overflow-hidden h-full">
 								<CodeEditor
 									height="100%"
