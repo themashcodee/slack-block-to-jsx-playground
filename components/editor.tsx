@@ -3,100 +3,7 @@ import { Block, Message } from "slack-blocks-to-jsx"
 import CodeEditor, { Monaco } from "@monaco-editor/react"
 import { ErrorBoundary } from "./error_boundary"
 
-const example1: Block[] = [
-	{
-		"type": "section",
-		"text": {
-			"type": "mrkdwn",
-			"text":
-				"Hello, Assistant to the Regional Manager Dwight! *Michael Scott* wants to know where you'd like to take the Paper Company investors to dinner tonight.\n\n *Please select a restaurant:*",
-		},
-	},
-	{
-		"type": "divider",
-	},
-	{
-		"type": "section",
-		"text": {
-			"type": "mrkdwn",
-			"text":
-				"*Farmhouse Thai Cuisine*\n:star::star::star::star: 1528 reviews\n They do have some vegan options, like the roti and curry, plus they have a ton of salad stuff and noodles can be ordered without meat!! They have something for everyone here",
-		},
-		"accessory": {
-			"type": "image",
-			"image_url":
-				"https://s3-media3.fl.yelpcdn.com/bphoto/c7ed05m9lC2EmA3Aruue7A/o.jpg",
-			"alt_text": "alt text for image",
-		},
-	},
-	{
-		"type": "section",
-		"text": {
-			"type": "mrkdwn",
-			"text":
-				"*Kin Khao*\n:star::star::star::star: 1638 reviews\n The sticky rice also goes wonderfully with the caramelized pork belly, which is absolutely melt-in-your-mouth and so soft.",
-		},
-		"accessory": {
-			"type": "image",
-			"image_url":
-				"https://s3-media2.fl.yelpcdn.com/bphoto/korel-1YjNtFtJlMTaC26A/o.jpg",
-			"alt_text": "alt text for image",
-		},
-	},
-	{
-		"type": "section",
-		"text": {
-			"type": "mrkdwn",
-			"text":
-				"*Ler Ros*\n:star::star::star::star: 2082 reviews\n I would really recommend the  Yum Koh Moo Yang - Spicy lime dressing and roasted quick marinated pork shoulder, basil leaves, chili & rice powder.",
-		},
-		"accessory": {
-			"type": "image",
-			"image_url":
-				"https://s3-media2.fl.yelpcdn.com/bphoto/DawwNigKJ2ckPeDeDM7jAg/o.jpg",
-			"alt_text": "alt text for image",
-		},
-	},
-	{
-		"type": "divider",
-	},
-	{
-		"type": "actions",
-		"elements": [
-			{
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Farmhouse",
-					"emoji": true,
-				},
-				"value": "click_me_123",
-			},
-			{
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Kin Khao",
-					"emoji": true,
-				},
-				"value": "click_me_123",
-				"url": "https://google.com",
-			},
-			{
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "Ler Ros",
-					"emoji": true,
-				},
-				"value": "click_me_123",
-				"url": "https://google.com",
-			},
-		],
-	},
-]
-
-const blocks2: Block[] = [
+const example: Block[] = [
 	{
 		"type": "rich_text",
 		"elements": [
@@ -400,9 +307,149 @@ const blocks2: Block[] = [
 			},
 		],
 	},
+	{
+		"type": "rich_text",
+		"block_id": "9xF+h",
+		"elements": [
+			{
+				"type": "rich_text_section",
+				"elements": [
+					{
+						"type": "emoji",
+						"name": "smiley",
+						"unicode": "1f603",
+					},
+					{
+						"type": "emoji",
+						"name": "smiling_face_with_3_hearts",
+						"unicode": "1f970",
+					},
+					{
+						"type": "emoji",
+						"name": "+1",
+						"unicode": "1f44d",
+					},
+					{
+						"type": "emoji",
+						"name": "thumbsup",
+						"unicode": "1f44d-1f3fb",
+						"skin_tone": 2,
+					},
+					{
+						"type": "user",
+						"user_id": "U037FL0HPRR",
+						style: {
+							bold: true,
+							italic: true,
+							strike: true,
+						},
+					},
+					{
+						"type": "text",
+						"text": " hello man ",
+					},
+					{
+						"type": "link",
+						"url": "http://hi.com",
+						"text": "hello world",
+					},
+					{
+						"type": "text",
+						"text": " ",
+					},
+					{
+						"type": "link",
+						"url": "http://hi.com",
+						"text": "hi.com",
+					},
+					{
+						"type": "text",
+						"text": " ",
+					},
+					{
+						"type": "broadcast",
+						"range": "here",
+					},
+					{
+						"type": "text",
+						"text": " hi everyone ",
+					},
+					{
+						"type": "broadcast",
+						"range": "channel",
+					},
+					{
+						"type": "text",
+						"text": " hello everyone ",
+					},
+					{
+						"type": "broadcast",
+						"range": "everyone",
+					},
+					{
+						"type": "text",
+						"text": " hejj",
+					},
+					{
+						"type": "text",
+						"text": "This is a rich text section with regular text. ",
+					},
+					{
+						"type": "text",
+						"text": "This is bold",
+						"style": {
+							"bold": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": ". ",
+					},
+					{
+						"type": "text",
+						"text": "This is italics.",
+						"style": {
+							"italic": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": " ",
+						"style": {
+							"bold": true,
+							"italic": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": "This is strikethrough.",
+						"style": {
+							"strike": true,
+						},
+					},
+					{
+						"type": "text",
+						"text": " ",
+					},
+					{
+						"type": "text",
+						"text": "This is code.",
+						"style": {
+							"code": true,
+						},
+					},
+				],
+			},
+		],
+	},
+	{
+		type: "section",
+		text: {
+			type: "mrkdwn",
+			text: "Hellow world\nhello world\n\nhellow orld",
+		},
+	},
 ]
-
-const example = [...blocks2]
 
 export const Editor = () => {
 	const [blocks, setBlocks] = useState<Block[]>(example)
@@ -536,7 +583,24 @@ export const Editor = () => {
 												id: "U060JP64TQF",
 												name: "Mash Codee",
 											},
+											{
+												id: "U037FL0HPRR",
+												name: "Mash Codee",
+											},
 										],
+									}}
+									hooks={{
+										user(data) {
+											return (
+												<span
+													onClick={() => {
+														alert("Guess what, we support custom wrappers")
+													}}
+												>
+													@{data.name}
+												</span>
+											)
+										},
 									}}
 								/>
 							</ErrorBoundary>

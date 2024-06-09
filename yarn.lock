@@ -2485,10 +2485,10 @@ skin-tone@^2.0.0:
   dependencies:
     unicode-emoji-modifier-base "^1.0.0"
 
-slack-blocks-to-jsx@0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.1.7.tgz#fb1001c03f15929c38f6e10bf628c2230559f826"
-  integrity sha512-bmq9RiDVtMcPQ/zR0DZjvNs5zPOlrXC+AAWQrBS7wo4z+aa2rFF9Qyl51VoP8+02wDtqjbfftHhnnim6/FHS+A==
+slack-blocks-to-jsx@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.1.8.tgz#434c6e11a91651c1bed5b8d9d847633365e6bca4"
+  integrity sha512-xCBwPaVTQD9AtT1Zv1M0iYNC0SiSMmcNiKq7gcC+hPOkIJLHqygN2umZXzpa+PDZLPlrSQpxtIjquRyDGE/L4g==
   dependencies:
     html-react-parser "^4.2.2"
     node-emoji "^2.1.0"
