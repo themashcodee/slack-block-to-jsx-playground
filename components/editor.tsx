@@ -22,7 +22,7 @@ const example: Block[] = [
 					},
 					{
 						"type": "user",
-						"user_id": "U060JP64TQF",
+						"user_id": "U2TEST",
 						style: {
 							"bold": true,
 							"italic": true,
@@ -39,7 +39,7 @@ const example: Block[] = [
 	},
 	{
 		"type": "rich_text",
-		"block_id": "9xF+h",
+		"block_id": "9xF+h2kh21",
 		"elements": [
 			{
 				"type": "rich_text_section",
@@ -317,27 +317,22 @@ const example: Block[] = [
 					{
 						"type": "emoji",
 						"name": "smiley",
-						"unicode": "1f603",
 					},
 					{
 						"type": "emoji",
 						"name": "smiling_face_with_3_hearts",
-						"unicode": "1f970",
 					},
 					{
 						"type": "emoji",
 						"name": "+1",
-						"unicode": "1f44d",
 					},
 					{
 						"type": "emoji",
 						"name": "thumbsup",
-						"unicode": "1f44d-1f3fb",
-						"skin_tone": 2,
 					},
 					{
 						"type": "user",
-						"user_id": "U037FL0HPRR",
+						"user_id": "U3TEST",
 						style: {
 							bold: true,
 							italic: true,
@@ -446,7 +441,7 @@ const example: Block[] = [
 		type: "section",
 		text: {
 			type: "mrkdwn",
-			text: "Hellow world\nhello world\n\nhellow orld",
+			text: "Hellow world\nhello world\n\nhellow orld <@U1TEST> and <@U2TEST> have been recognized for *:busts_in_silhouette: Collaborates Radically* by <@U3TEST> on <#C1TEST> and <!subteam^SAZ94GDB8> and <#general> @here @everyone @channel @hello _this is italic_ and _~this is strikethrough~_\nThis is a like break, ~another strikethrough~ and this is is `inline **code**` okay cool ```This is a code block\nAnd it's multi-line``` now here is the list \n- Detective Chimp\n- Bouncing Boy \n\n\n- Aqualad hello dot. \n<http://www.example.com|This message *is* a link> Hello",
 		},
 	},
 ]
@@ -556,49 +551,61 @@ export const Editor = () => {
 									showBlockKitDebug
 									blocks={blocks}
 									data={{
+										user_groups: [
+											{
+												id: "SAZ94GDB8",
+												name: "My User Group",
+											},
+										],
 										channels: [
 											{
-												id: "C01HP7H5HME",
+												id: "C1TEST",
 												name: "general",
 											},
 											{
-												id: "C01HP7H61PS",
+												id: "C2TEST",
 												name: "leadership-feedback",
 											},
 										],
 										users: [
 											{
-												id: "U02E1L6UXC5",
+												id: "U1TEST",
 												name: "Amanda",
 											},
 											{
-												id: "U06DVC13S1H",
-												name: "Matt",
+												id: "U2TEST",
+												name: "Harry",
 											},
 											{
-												id: "U0649LT5ME2",
-												name: "Michael",
+												id: "U3TEST",
+												name: "John",
 											},
 											{
-												id: "U060JP64TQF",
+												id: "U4TEST",
 												name: "Mash Codee",
 											},
 											{
-												id: "U037FL0HPRR",
-												name: "Mash Codee",
+												id: "U5TEST",
+												name: "Jake",
 											},
 										],
 									}}
 									hooks={{
 										user(data) {
 											return (
-												<span
+												<button
+													style={{
+														background: "#187C58",
+														backgroundImage:
+															"linear-gradient(135deg, #187C58, #40C28C)",
+														color: "white",
+													}}
 													onClick={() => {
 														alert("Guess what, we support custom wrappers")
 													}}
 												>
-													@{data.name}
-												</span>
+													@{data.name} (user custom wrapper)
+												</button>
 											)
 										},
 									}}
