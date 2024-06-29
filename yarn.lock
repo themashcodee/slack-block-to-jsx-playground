@@ -2263,7 +2263,7 @@ next@14.1.4:
     "@next/swc-win32-ia32-msvc" "14.1.4"
     "@next/swc-win32-x64-msvc" "14.1.4"
 
-node-emoji@^2.1.0:
+node-emoji@^2.1.3:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/node-emoji/-/node-emoji-2.1.3.tgz#93cfabb5cc7c3653aa52f29d6ffb7927d8047c06"
   integrity sha512-E2WEOVsgs7O16zsURJ/eH8BqhF029wGpEOnv7Urwdo2wmQanOACwJQh0devF9D9RhoZru0+9JXIS0dBXIAz+lA==
@@ -2751,16 +2751,16 @@ skin-tone@^2.0.0:
   dependencies:
     unicode-emoji-modifier-base "^1.0.0"
 
-slack-blocks-to-jsx@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.3.0.tgz#5e552bd268b19df4e9f8b57af37a346ab0cfd246"
-  integrity sha512-qQ/TT492vZOpU9GUfkq/QxpnV4wVHu+FbNPExeUqF+RQIYWo4G9exhhkICyj2mOxN024jsvcNfMVkJSPV94WHg==
+slack-blocks-to-jsx@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.3.3.tgz#5d0eff5aa0fe25bdee81973eb9911b3c67046269"
+  integrity sha512-jBRE5vXl1iRg8L2iOGD1OHAHc7RyWXhIhy7f2V1eiNvgAEHzHWDnVupWar0g+nRGCJlIcShNDayoFh1wAFuTnQ==
   dependencies:
     "@yozora/ast" "^2.3.2"
     "@yozora/character" "^2.3.2"
     "@yozora/core-tokenizer" "^2.3.2"
     "@yozora/parser" "^2.3.2"
-    node-emoji "^2.1.0"
+    node-emoji "^2.1.3"
     zustand "^4.5.2"
 
 slash@^3.0.0:
