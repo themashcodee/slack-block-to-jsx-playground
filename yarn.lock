@@ -2751,10 +2751,10 @@ skin-tone@^2.0.0:
   dependencies:
     unicode-emoji-modifier-base "^1.0.0"
 
-slack-blocks-to-jsx@^0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.3.3.tgz#5d0eff5aa0fe25bdee81973eb9911b3c67046269"
-  integrity sha512-jBRE5vXl1iRg8L2iOGD1OHAHc7RyWXhIhy7f2V1eiNvgAEHzHWDnVupWar0g+nRGCJlIcShNDayoFh1wAFuTnQ==
+slack-blocks-to-jsx@^0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.3.5.tgz#1806ec1b8bc3863bf93b4db16d9421b6af692b4a"
+  integrity sha512-sbdJKsREeDfU84JxhwVwn7tsu3SeE6T0cGOM8KxB+GDkH6o0hIZI0UNvRfWQ1MX4I6SDcEqeV2omjnb1LWTPjA==
   dependencies:
     "@yozora/ast" "^2.3.2"
     "@yozora/character" "^2.3.2"
