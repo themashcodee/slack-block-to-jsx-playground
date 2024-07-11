@@ -437,7 +437,7 @@ const example: Block[] = [
 		type: "section",
 		text: {
 			type: "mrkdwn",
-			text: "Hellow world\nhello world\n\nhellow orld <@U1TEST> and <@U2TEST> have been recognized for *:busts_in_silhouette: Collaborates Radically* by <@U3TEST> on <#C1TEST> and <!subteam^SAZ94GDB8> and <#general> @here @everyone @channel @hello _this is italic_ and _~this is strikethrough~_\nThis is a like break, ~another strikethrough~ and this is is `inline **code**` okay cool ```This is a code block\nAnd it's multi-line``` now here is the list \n- Detective Chimp\n- Bouncing Boy \n\n\n- Aqualad hello dot. \n<http://www.example.com|This message *is* a link> Hello _*<!date^1392734382^Posted {date_short} {time_secs}^https://youtube.com|Posted 2014-02-18 6:39:42 AM PST>*_",
+			text: "Hellow world\nhello world\n\nhellow orld <@U1TEST> and <@U2TEST> have been recognized for *:busts_in_silhouette: Collaborates Radically* by <@U3TEST> on <#C1TEST> and <!subteam^SAZ94GDB8> and <#general> @here @everyone @channel @hello _this is italic_ and _~this is strikethrough~_\nThis is a like break, ~another strikethrough~ and this is is `inline **code**` okay cool ```This is a code block\nAnd it's multi-line``` now here is the list \n- Detective Chimp\n- Bouncing Boy \n\n\n- Aqualad hello dot. \n<http://www.example.com|This message *is* a link> Hello _*<!date^1392734382^Posted {date_short} {time_secs}^https://youtube.com|Posted 2014-02-18 6:39:42 AM PST>*_ hello :heart: :ok_hand::skin-tone-2:",
 		},
 	},
 ]
@@ -603,6 +603,17 @@ export const Editor = () => {
 													@{data.name} (user custom wrapper)
 												</button>
 											)
+										},
+										emoji: (name: string) => {
+											if (name === "heart") {
+												return (
+													<span className="font-medium">
+														I REPLACED HEART EMOJI
+													</span>
+												)
+											}
+
+											return "fallback"
 										},
 									}}
 								/>
