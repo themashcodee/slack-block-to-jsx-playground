@@ -604,7 +604,7 @@ export const Editor = () => {
 												</button>
 											)
 										},
-										emoji: (name: string) => {
+										emoji: (name: string, parse) => {
 											if (name === "heart") {
 												return (
 													<span className="font-medium">
@@ -613,7 +613,7 @@ export const Editor = () => {
 												)
 											}
 
-											return "fallback"
+											return parse(name)
 										},
 									}}
 								/>
