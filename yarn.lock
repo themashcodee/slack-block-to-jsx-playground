@@ -2751,17 +2751,16 @@ skin-tone@^2.0.0:
   dependencies:
     unicode-emoji-modifier-base "^1.0.0"
 
-slack-blocks-to-jsx@^0.3.10:
-  version "0.3.10"
-  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.3.10.tgz#a5f9394a2949402f0d1156d5c580e65570bec013"
-  integrity sha512-2W3mDzadofnCV383SBLVPiphmsyUiOdTY1jYxon1QxFocBExyT/JQHI7EWJ37jLgecT+U5ojeH0lx9nVOv7M5w==
+slack-blocks-to-jsx@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/slack-blocks-to-jsx/-/slack-blocks-to-jsx-0.4.0.tgz#1585447d56d5e391a201fcd64ea2e519df626c54"
+  integrity sha512-cIftaJntPSfJR5nyVjogey2OCnbQSncB+nUkKXiQNiaxCUSebkkvkf6rT73TkpzrBsnSZzDW9wvSib0biLI8FA==
   dependencies:
     "@yozora/ast" "^2.3.2"
     "@yozora/character" "^2.3.2"
     "@yozora/core-tokenizer" "^2.3.2"
     "@yozora/parser" "^2.3.2"
     node-emoji "^2.1.3"
-    zustand "^4.5.2"
 
 slash@^3.0.0:
   version "3.0.0"
@@ -3084,11 +3083,6 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-use-sync-external-store@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
-  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
-
 util-deprecate@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
@@ -3188,10 +3182,3 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
-
-zustand@^4.5.2:
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.5.2.tgz#fddbe7cac1e71d45413b3682cdb47b48034c3848"
-  integrity sha512-2cN1tPkDVkwCy5ickKrI7vijSjPksFRfqS6237NzT0vqSsztTNnQdHw9mmN7uBdk3gceVXU0a+21jFzFzAc9+g==
-  dependencies:
-    use-sync-external-store "1.2.0"
