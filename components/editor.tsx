@@ -316,7 +316,7 @@ const example: Block[] = [
 				"elements": [
 					{
 						"type": "emoji",
-						"name": "grinning_face",
+						"name": "couple_with_heart",
 						skin_tone: 2,
 						unicode: "1f9d1-1f3fc-200d-2764-fe0f-200d-1f9d1-1f3fe",
 					},
