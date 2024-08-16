@@ -316,7 +316,9 @@ const example: Block[] = [
 				"elements": [
 					{
 						"type": "emoji",
-						"name": "smiley",
+						"name": "grinning_face",
+						skin_tone: 2,
+						unicode: "1f9d1-1f3fc-200d-2764-fe0f-200d-1f9d1-1f3fe",
 					},
 					{
 						"type": "emoji",
@@ -604,17 +606,17 @@ export const Editor = () => {
 												</button>
 											)
 										},
-										emoji: (name: string, parse) => {
-											if (name === "heart") {
-												return (
-													<span className="font-medium">
-														I REPLACED HEART EMOJI
-													</span>
-												)
-											}
+										// emoji: (data, parse) => {
+										// 	if (data.name === "heart") {
+										// 		return (
+										// 			<span className="font-medium">
+										// 				I REPLACED HEART EMOJI
+										// 			</span>
+										// 		)
+										// 	}
 
-											return parse(name)
-										},
+										// 	return parse(data)
+										// },
 									}}
 								/>
 							</ErrorBoundary>
