@@ -2,6 +2,8 @@ import React, { useRef, useState } from "react"
 import { Block, Message } from "slack-blocks-to-jsx"
 import CodeEditor, { Monaco } from "@monaco-editor/react"
 import { ErrorBoundary } from "./error_boundary"
+import packageJson from "../package.json"
+const version = packageJson.dependencies["slack-blocks-to-jsx"]
 
 const example: Block[] = [
 	{
@@ -462,11 +464,22 @@ export const Editor = () => {
 					<div className="flex items-center gap-2">
 						<p className="text-2xl">🧪</p>
 
-						<div className="flex flex-col">
-							<p className="text-lg font-medium">
-								Slack Blocks to JSX NPM Library Playground
+						<div className="flex flex-col gap-1">
+							<p className="text-lg font-medium leading-none flex gap-2 flex-wrap items-center">
+								<span>Slack Blocks to JSX NPM Library Playground</span>
+
+								<span>
+									<a
+										href={`https://github.com/themashcodee/slack-blocks-to-jsx/releases/tag/v${version}`}
+										target="_blank"
+										rel="noreferrer"
+										className="text-blue-600 text-base"
+									>
+										(using v{version})
+									</a>
+								</span>
 							</p>
-							<p className="text-gray-500 text-xs">
+							<p className="text-gray-500 text-xs leading-none">
 								Render Slack blocks in React with ease with your own logo, name,
 								and time.
 							</p>
