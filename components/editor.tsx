@@ -3,6 +3,8 @@ import { Block, Message } from "slack-blocks-to-jsx"
 import CodeEditor, { Monaco } from "@monaco-editor/react"
 import { ErrorBoundary } from "./error_boundary"
 import packageJson from "../package.json"
+import { images } from "@/images"
+import Image from "next/image"
 const version = packageJson.dependencies["slack-blocks-to-jsx"]
 
 const example: Block[] = [
@@ -459,29 +461,26 @@ export const Editor = () => {
 
 	return (
 		<div className="w-full">
-			<div className="p-6 flex flex-col gap-4 w-full">
-				<header className="lg:h-16 shrink-0 bg-white rounded-xl w-full flex flex-col lg:flex-row items-center justify-between px-4 py-4">
+			<div className="p-6 sm:p-8 flex flex-col gap-6 w-full">
+				<header className="lg:h-16 shrink-0 bg-white rounded-xl w-full flex flex-col lg:flex-row items-center justify-between px-4 py-4 border border-black">
 					<div className="flex items-center gap-2">
-						<p className="text-2xl">🧪</p>
+						<div className="flex flex-col gap-2">
+							<p className="text-lg leading-none flex gap-2 flex-wrap items-center">
+								<span className="font-medium">Slack Blocks to JSX</span>
 
-						<div className="flex flex-col gap-1">
-							<p className="text-lg font-medium leading-none flex gap-2 flex-wrap items-center">
-								<span>Slack Blocks to JSX NPM Library Playground</span>
-
-								<span>
-									<a
-										href={`https://github.com/themashcodee/slack-blocks-to-jsx/releases/tag/v${version}`}
-										target="_blank"
-										rel="noreferrer"
-										className="text-blue-600 text-base"
-									>
-										(using v{version})
-									</a>
-								</span>
+								<a
+									href={`https://github.com/themashcodee/slack-blocks-to-jsx/releases/tag/v${version}`}
+									target="_blank"
+									rel="noreferrer"
+									className="text-xs bg-[#F9C603] px-2 py-[1.5px] rounded"
+								>
+									v{version}
+								</a>
 							</p>
+
 							<p className="text-gray-500 text-xs leading-none">
-								Render Slack blocks in React with ease with your own logo, name,
-								and time.
+								A playground for rendering Slack blocks in React with custom
+								branding.
 							</p>
 						</div>
 					</div>
@@ -532,7 +531,7 @@ export const Editor = () => {
 
 				<div className="w-full max-h-max grid lg:grid-cols-7 grid-cols-1 gap-6">
 					<div className="lg:col-span-3 w-full">
-						<div className="bg-white rounded-xl p-4 shadow-sm border w-full h-full">
+						<div className="bg-white rounded-xl p-4 border border-black w-full h-full">
 							<ErrorBoundary
 								fallback={
 									<div className="w-full h-full flex items-center justify-center p-6">
@@ -636,32 +635,75 @@ export const Editor = () => {
 						</div>
 					</div>
 
-					<div className="lg:col-span-4 w-full max-h-[600px] h-full">
-						<div className="w-full rounded-xl bg-white border h-full shadow-sm p-4">
-							<div className="w-full rounded-lg overflow-hidden h-full">
-								<CodeEditor
-									height="100%"
-									defaultLanguage="json"
-									language="json"
-									defaultValue={code}
-									value={code}
-									theme="vs-dark"
-									onChange={(value) => {
-										if (value) {
-											setCode(value)
-											try {
-												const parsed = JSON.parse(value)
-												setBlocks(parsed)
-											} catch (error) {
-												console.error(error)
+					<div className="lg:col-span-4 w-full h-full flex flex-col gap-6">
+						<div className="h-[600px] shrink-0 overflow-hidden">
+							<div className="w-full rounded-xl bg-white border border-black h-full p-4">
+								<div className="w-full rounded-lg overflow-hidden h-full">
+									<CodeEditor
+										height="100%"
+										defaultLanguage="json"
+										language="json"
+										defaultValue={code}
+										value={code}
+										theme="vs-dark"
+										onChange={(value) => {
+											if (value) {
+												setCode(value)
+												try {
+													const parsed = JSON.parse(value)
+													setBlocks(parsed)
+												} catch (error) {
+													console.error(error)
+												}
 											}
-										}
-									}}
-									onMount={handleEditorDidMount}
-									options={{
-										minimap: { enabled: false },
-									}}
-								/>
+										}}
+										onMount={handleEditorDidMount}
+										options={{
+											minimap: { enabled: false },
+											scrollBeyondLastLine: false, // This prevents extra space after the last line
+										}}
+									/>
+								</div>
+							</div>
+						</div>
+
+						<div className="w-full rounded-xl bg-white border border-black p-6 flex flex-row items-center justify-between gap-6">
+							<div className="flex flex-col items-start text-left">
+								<h3 className="text-xl font-medium mb-2">
+									Keep the Energy Alive with Coffee & Love 💕☕️
+								</h3>
+								<p className="mb-2 text-gray-500">
+									Your kindness keeps this project alive and vibrant. Every
+									coffee you buy keeps the ideas flowing, and me smiling. Donate
+									now!
+								</p>
+								<a
+									href="https://www.buymeacoffee.com/themashcodee"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="mt-2 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm hover:bg-yellow-500 transition-colors"
+								>
+									Treat me to a coffee! ❤️
+								</a>
+							</div>
+
+							<div className="flex flex-col items-center gap-2 shrink-0">
+								<a
+									href="https://www.buymeacoffee.com/themashcodee"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<Image
+										width={80}
+										height={80}
+										src={images.buymeacoffee_qr}
+										alt="Buy me a coffee QR code"
+									/>
+								</a>
+								<p className="text-sm text-gray-600 text-center">
+									Scan the QR
+									<br /> code to donate
+								</p>
 							</div>
 						</div>
 					</div>
