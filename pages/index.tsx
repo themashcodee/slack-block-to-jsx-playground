@@ -1,5 +1,5 @@
 import { Editor } from "@/components"
-import { Outfit, Inter } from "next/font/google"
+import { Outfit } from "next/font/google"
 
 const font = Outfit({ subsets: ["latin"] })
 

@@ -462,7 +462,7 @@ export const Editor = () => {
 	return (
 		<div className="w-full">
 			<div className="p-6 sm:p-8 flex flex-col gap-6 w-full">
-				<header className="lg:h-16 shrink-0 bg-white rounded-xl w-full flex flex-col lg:flex-row items-center justify-between px-4 py-4 border border-black">
+				<header className="lg:h-16 shrink-0 bg-white rounded-xl w-full flex flex-col lg:flex-row lg:items-center justify-between px-4 py-4 border border-black gap-2">
 					<div className="flex items-center gap-2">
 						<div className="flex flex-col gap-2">
 							<p className="text-lg leading-none flex gap-2 flex-wrap items-center">
@@ -485,7 +485,7 @@ export const Editor = () => {
 						</div>
 					</div>
 
-					<div className="flex items-center gap-6">
+					<div className="flex items-center gap-2 lg:gap-6">
 						<a
 							href="https://www.npmjs.com/package/slack-blocks-to-jsx"
 							target="_blank"
@@ -687,7 +687,7 @@ export const Editor = () => {
 								</a>
 							</div>
 
-							<div className="flex flex-col items-center gap-2 shrink-0">
+							<div className="hidden flex-col items-center gap-2 shrink-0 sm:flex">
 								<a
 									href="https://www.buymeacoffee.com/themashcodee"
 									target="_blank"
