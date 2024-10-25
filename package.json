@@ -13,7 +13,7 @@
     "next": "14.1.4",
     "react": "^18",
     "react-dom": "^18",
-    "slack-blocks-to-jsx": "0.5.9"
+    "slack-blocks-to-jsx": "0.6.0"
   },
   "devDependencies": {
     "@types/node": "^20",
