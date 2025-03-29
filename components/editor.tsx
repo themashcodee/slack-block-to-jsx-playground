@@ -648,12 +648,23 @@ export const Editor = () => {
 										theme="vs-dark"
 										onChange={(value) => {
 											if (value) {
-												setCode(value)
 												try {
-													const parsed = JSON.parse(value)
-													setBlocks(parsed)
+													const parsed = JSON.parse(value.trim())
+													if (Array.isArray(parsed)) {
+														setBlocks(parsed)
+														setCode(value)
+													} else if (
+														parsed &&
+														typeof parsed === "object" &&
+														"blocks" in parsed
+													) {
+														setBlocks(parsed.blocks)
+														setCode(JSON.stringify(parsed.blocks, null, 2))
+													} else {
+														setCode(value)
+													}
 												} catch (error) {
-													console.error(error)
+													setCode(value)
 												}
 											}
 										}}
