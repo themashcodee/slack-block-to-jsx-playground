@@ -30,7 +30,7 @@ export const Test = () => {
 				return (
 					<Message
 						key={i}
-						logo="https://static-00.iconduck.com/assets.00/slack-icon-2048x2048-5nfqoyso.png"
+						logo="https://a.slack-edge.com/80588/marketing/img/meta/slack_hash_256.png"
 						name="Random"
 						time={new Date()}
 						blocks={block}

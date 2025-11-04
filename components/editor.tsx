@@ -1,10 +1,19 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import { Block, Message } from "slack-blocks-to-jsx"
 import CodeEditor, { Monaco } from "@monaco-editor/react"
 import { ErrorBoundary } from "./error_boundary"
+import { ConfigEditor } from "./config_editor"
 import packageJson from "../package.json"
 import { images } from "@/images"
 import Image from "next/image"
+import { MessageConfig } from "@/types/config"
+import {
+	defaultConfig,
+	loadConfig,
+	saveConfig,
+	loadBlocks,
+	saveBlocks,
+} from "@/utils/config"
 const version = packageJson.dependencies["slack-blocks-to-jsx"]
 
 const example: Block[] = [
@@ -451,7 +460,37 @@ const example: Block[] = [
 export const Editor = () => {
 	const [blocks, setBlocks] = useState<Block[]>(example)
 	const [code, setCode] = useState(JSON.stringify(blocks, null, 2))
+	const [config, setConfig] = useState<MessageConfig>(defaultConfig)
+	const [activeTab, setActiveTab] = useState<"blocks" | "config">("blocks")
 	const editorRef = useRef(null)
+
+	// Load from localStorage on mount
+	useEffect(() => {
+		const savedConfig = loadConfig()
+		if (savedConfig) {
+			setConfig(savedConfig)
+		}
+
+		const savedBlocks = loadBlocks()
+		if (savedBlocks) {
+			setBlocks(savedBlocks as Block[])
+			setCode(JSON.stringify(savedBlocks, null, 2))
+		}
+	}, [])
+
+	// Auto-save config to localStorage
+	useEffect(() => {
+		saveConfig(config)
+	}, [config])
+
+	// Auto-save blocks to localStorage
+	useEffect(() => {
+		saveBlocks(blocks)
+	}, [blocks])
+
+	const handleConfigChange = (newConfig: MessageConfig) => {
+		setConfig(newConfig)
+	}
 
 	function handleEditorDidMount(editor: any, monaco: Monaco) {
 		if (editorRef.current) {
@@ -555,81 +594,38 @@ export const Editor = () => {
 								}
 							>
 								<Message
-									logo="https://static-00.iconduck.com/assets.00/slack-icon-2048x2048-5nfqoyso.png"
-									name="Acme Bot"
-									time={new Date()}
-									showBlockKitDebug
+									key={`message-${config.enableCustomUserHook ? "with-hooks" : "no-hooks"}`}
+									logo={config.logo}
+									name={config.name}
+									time={config.time || undefined}
+									showBlockKitDebug={config.showBlockKitDebug}
 									blocks={blocks}
-									data={{
-										user_groups: [
-											{
-												id: "SAZ94GDB8",
-												name: "My User Group",
-											},
-										],
-										channels: [
-											{
-												id: "C1TEST",
-												name: "general",
-											},
-											{
-												id: "C2TEST",
-												name: "leadership-feedback",
-											},
-										],
-										users: [
-											{
-												id: "U1TEST",
-												name: "Amanda",
-											},
-											{
-												id: "U2TEST",
-												name: "Harry",
-											},
-											{
-												id: "U3TEST",
-												name: "John",
-											},
-											{
-												id: "U4TEST",
-												name: "Mash Codee",
-											},
-											{
-												id: "U5TEST",
-												name: "Jake",
-											},
-										],
-									}}
-									hooks={{
-										user(data) {
-											return (
-												<button
-													style={{
-														background: "#187C58",
-														backgroundImage:
-															"linear-gradient(135deg, #187C58, #40C28C)",
-														color: "white",
-													}}
-													onClick={() => {
-														alert("Guess what, we support custom wrappers")
-													}}
-												>
-													@{data.name} (user custom wrapper)
-												</button>
-											)
-										},
-										// emoji: (data, parse) => {
-										// 	if (data.name === "heart") {
-										// 		return (
-										// 			<span className="font-medium">
-										// 				I REPLACED HEART EMOJI
-										// 			</span>
-										// 		)
-										// 	}
-
-										// 	return parse(data)
-										// },
-									}}
+									unstyled={config.unstyled}
+									withoutWrapper={config.withoutWrapper}
+									data={config.data}
+									hooks={
+										config.enableCustomUserHook
+											? {
+													user(data) {
+														return (
+															<button
+																style={{
+																	background: "#187C58",
+																	backgroundImage:
+																		"linear-gradient(135deg, #187C58, #40C28C)",
+																	color: "white",
+																}}
+																onClick={() => {
+																	alert("Guess what, we support custom wrappers")
+																}}
+															>
+																@{data.name} (user custom wrapper)
+															</button>
+														)
+													},
+											  }
+											: undefined
+									}
 								/>
 							</ErrorBoundary>
 						</div>
@@ -637,43 +633,79 @@ export const Editor = () => {
 
 					<div className="lg:col-span-4 w-full h-full flex flex-col gap-6">
 						<div className="h-[600px] shrink-0 overflow-hidden">
-							<div className="w-full rounded-xl bg-white border border-black h-full p-4">
-								<div className="w-full rounded-lg overflow-hidden h-full">
-									<CodeEditor
-										height="100%"
-										defaultLanguage="json"
-										language="json"
-										defaultValue={code}
-										value={code}
-										theme="vs-dark"
-										onChange={(value) => {
-											if (value) {
-												try {
-													const parsed = JSON.parse(value.trim())
-													if (Array.isArray(parsed)) {
-														setBlocks(parsed)
-														setCode(value)
-													} else if (
-														parsed &&
-														typeof parsed === "object" &&
-														"blocks" in parsed
-													) {
-														setBlocks(parsed.blocks)
-														setCode(JSON.stringify(parsed.blocks, null, 2))
-													} else {
-														setCode(value)
+							<div className="w-full rounded-xl bg-white border border-black h-full p-4 flex flex-col">
+								{/* Tab Navigation */}
+								<div className="flex items-center gap-2 mb-4 border-b border-gray-200 pb-2">
+									<button
+										onClick={() => setActiveTab("blocks")}
+										className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
+											activeTab === "blocks"
+												? "bg-gray-900 text-white"
+												: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+										}`}
+									>
+										Blocks JSON
+									</button>
+									<button
+										onClick={() => setActiveTab("config")}
+										className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
+											activeTab === "config"
+												? "bg-gray-900 text-white"
+												: "bg-gray-100 text-gray-700 hover:bg-gray-200"
+										}`}
+									>
+										Configuration
+									</button>
+								</div>
+
+								{/* Tab Content */}
+								<div className="flex-1 overflow-hidden">
+									{activeTab === "blocks" && (
+										<div className="w-full rounded-lg overflow-hidden h-full">
+											<CodeEditor
+												height="100%"
+												defaultLanguage="json"
+												language="json"
+												defaultValue={code}
+												value={code}
+												theme="vs-dark"
+												onChange={(value) => {
+													if (value) {
+														try {
+															const parsed = JSON.parse(value.trim())
+															if (Array.isArray(parsed)) {
+																setBlocks(parsed)
+																setCode(value)
+															} else if (
+																parsed &&
+																typeof parsed === "object" &&
+																"blocks" in parsed
+															) {
+																setBlocks(parsed.blocks)
+																setCode(JSON.stringify(parsed.blocks, null, 2))
+															} else {
+																setCode(value)
+															}
+														} catch (error) {
+															setCode(value)
+														}
 													}
-												} catch (error) {
-													setCode(value)
-												}
-											}
-										}}
-										onMount={handleEditorDidMount}
-										options={{
-											minimap: { enabled: false },
-											scrollBeyondLastLine: false, // This prevents extra space after the last line
-										}}
-									/>
+												}}
+												onMount={handleEditorDidMount}
+												options={{
+													minimap: { enabled: false },
+													scrollBeyondLastLine: false,
+												}}
+											/>
+										</div>
+									)}
+
+									{activeTab === "config" && (
+										<ConfigEditor
+											config={config}
+											onConfigChange={handleConfigChange}
+										/>
+									)}
 								</div>
 							</div>
 						</div>
