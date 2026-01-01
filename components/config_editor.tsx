@@ -158,6 +158,27 @@ export const ConfigEditor: React.FC<ConfigEditorProps> = ({
 							Display Options
 						</h3>
 
+						<div>
+							<label className="block text-sm text-gray-600 mb-1">
+								Color Mode
+							</label>
+							<select
+								value={config.theme}
+								onChange={(e) =>
+									handleVisualChange({
+										theme: e.target.value as "light" | "dark",
+									})
+								}
+								className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+							>
+								<option value={undefined}>
+									Select Color Mode...
+								</option>
+								<option value="light">Light</option>
+								<option value="dark">Dark</option>
+							</select>
+						</div>
+
 						<div className="flex items-center gap-2">
 							<input
 								type="checkbox"

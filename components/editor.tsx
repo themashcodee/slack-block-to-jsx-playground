@@ -505,13 +505,13 @@ export const Editor = () => {
 					<div className="flex items-center gap-2">
 						<div className="flex flex-col gap-2">
 							<p className="text-lg leading-none flex gap-2 flex-wrap items-center">
-								<span className="font-medium">Slack Blocks to JSX</span>
+								<span className="font-medium text-black">Slack Blocks to JSX</span>
 
 								<a
 									href={`https://github.com/themashcodee/slack-blocks-to-jsx/releases/tag/v${version}`}
 									target="_blank"
 									rel="noreferrer"
-									className="text-xs bg-[#F9C603] px-2 py-[1.5px] rounded"
+									className="text-xs bg-[#F9C603] px-2 py-[1.5px] rounded text-black"
 								>
 									v{version}
 								</a>
@@ -594,11 +594,12 @@ export const Editor = () => {
 								}
 							>
 								<Message
-									key={`message-${config.enableCustomUserHook ? "with-hooks" : "no-hooks"}`}
+									key={`message-${config.theme ?? "default"}-${config.enableCustomUserHook ? "with-hooks" : "no-hooks"}`}
 									logo={config.logo}
 									name={config.name}
 									time={config.time || undefined}
 									showBlockKitDebug={config.showBlockKitDebug}
+									theme={config.theme}
 									blocks={blocks}
 									unstyled={config.unstyled}
 									withoutWrapper={config.withoutWrapper}
@@ -606,24 +607,24 @@ export const Editor = () => {
 									hooks={
 										config.enableCustomUserHook
 											? {
-													user(data) {
-														return (
-															<button
-																style={{
-																	background: "#187C58",
-																	backgroundImage:
-																		"linear-gradient(135deg, #187C58, #40C28C)",
-																	color: "white",
-																}}
-																onClick={() => {
-																	alert("Guess what, we support custom wrappers")
-																}}
-															>
-																@{data.name} (user custom wrapper)
-															</button>
-														)
-													},
-											  }
+												user(data) {
+													return (
+														<button
+															style={{
+																background: "#187C58",
+																backgroundImage:
+																	"linear-gradient(135deg, #187C58, #40C28C)",
+																color: "white",
+															}}
+															onClick={() => {
+																alert("Guess what, we support custom wrappers")
+															}}
+														>
+															@{data.name} (user custom wrapper)
+														</button>
+													)
+												},
+											}
 											: undefined
 									}
 								/>
@@ -638,21 +639,19 @@ export const Editor = () => {
 								<div className="flex items-center gap-2 mb-4 border-b border-gray-200 pb-2">
 									<button
 										onClick={() => setActiveTab("blocks")}
-										className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
-											activeTab === "blocks"
+										className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${activeTab === "blocks"
 												? "bg-gray-900 text-white"
 												: "bg-gray-100 text-gray-700 hover:bg-gray-200"
-										}`}
+											}`}
 									>
 										Blocks JSON
 									</button>
 									<button
 										onClick={() => setActiveTab("config")}
-										className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
-											activeTab === "config"
+										className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${activeTab === "config"
 												? "bg-gray-900 text-white"
 												: "bg-gray-100 text-gray-700 hover:bg-gray-200"
-										}`}
+											}`}
 									>
 										Configuration
 									</button>
@@ -710,7 +709,7 @@ export const Editor = () => {
 							</div>
 						</div>
 
-						<div className="w-full rounded-xl bg-white border border-black p-6 flex flex-row items-center justify-between gap-6">
+						<div className="w-full rounded-xl text-black bg-white border border-black p-6 flex flex-row items-center justify-between gap-6">
 							<div className="flex flex-col items-start text-left">
 								<h3 className="text-xl font-medium mb-2">
 									Keep the Energy Alive with Coffee & Love 💕☕️

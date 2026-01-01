@@ -3,6 +3,7 @@ export interface MessageConfig {
 	name: string
 	time: Date | null
 	showBlockKitDebug: boolean
+	theme?: "light" | "dark"
 	unstyled?: boolean
 	withoutWrapper?: boolean
 	enableCustomUserHook?: boolean
@@ -18,6 +19,7 @@ export interface SerializedMessageConfig {
 	name: string
 	time: string | null
 	showBlockKitDebug: boolean
+	theme?: "light" | "dark"
 	unstyled?: boolean
 	withoutWrapper?: boolean
 	enableCustomUserHook?: boolean
