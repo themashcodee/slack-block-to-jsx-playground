@@ -34,7 +34,7 @@ export const defaultConfig: MessageConfig = {
   name: "Acme Bot",
   time: new Date(),
   showBlockKitDebug: true,
-  theme: undefined,
+  theme: "light",
   unstyled: false,
   withoutWrapper: false,
   enableCustomUserHook: true,
