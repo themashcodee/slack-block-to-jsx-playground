@@ -1,2 +1,2 @@
-export * from "./editor"
-export * from "./config_editor"
+export * from "./editor";
+export * from "./config_editor";

@@ -1,3 +1,3 @@
-import buymeacoffee_qr from "./qr.png"
+import buymeacoffee_qr from "./qr.png";
 
-export const images = { buymeacoffee_qr: buymeacoffee_qr.src }
+export const images = { buymeacoffee_qr: buymeacoffee_qr.src };
