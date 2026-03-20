@@ -11,10 +11,12 @@
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
     "lz-string": "^1.5.0",
-    "next": "14.1.4",
+    "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "slack-blocks-to-jsx": "0.8.6"
+    "react-markdown": "9",
+    "remark-gfm": "4",
+    "slack-blocks-to-jsx": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",
