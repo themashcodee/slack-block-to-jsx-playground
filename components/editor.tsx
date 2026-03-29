@@ -690,7 +690,7 @@ export const Editor = () => {
 									/>
 								</a>
 								<p className="text-ds-xs text-ds-text-disabled text-center">
-									Scan to donate
+									Scan to support
 								</p>
 							</div>
 						</div>
