@@ -62,6 +62,16 @@ const createPreviewHtml = (librarySpec: string, payload: unknown) => {
 				white-space: pre-wrap;
 			}
 		</style>
+		<script type="importmap">
+			{
+				"imports": {
+					"react": "https://esm.sh/react@18.3.1",
+					"react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+					"react-dom": "https://esm.sh/react-dom@18.3.1?external=react",
+					"react-dom/client": "https://esm.sh/react-dom@18.3.1/client?external=react"
+				}
+			}
+		</script>
 	</head>
 	<body>
 		<div id="root"></div>
@@ -105,8 +115,8 @@ const createPreviewHtml = (librarySpec: string, payload: unknown) => {
 
 			try {
 				const [{ default: React }, ReactDOM, library] = await Promise.all([
-					import("https://esm.sh/react@18.3.1"),
-					import("https://esm.sh/react-dom@18.3.1/client?external=react"),
+					import("react"),
+					import("react-dom/client"),
 					import("${moduleUrl}")
 				]);
 
