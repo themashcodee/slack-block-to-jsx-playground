@@ -9,6 +9,9 @@ import type { NextApiRequest, NextApiResponse } from "next"
 const execFile = promisify(execFileCallback)
 
 const CACHE_ROOT = path.join(os.tmpdir(), "slack-blocks-to-jsx-playground")
+const NPM_HOME = path.join(CACHE_ROOT, "home")
+const NPM_CACHE = path.join(CACHE_ROOT, "npm-cache")
+const NPM_PREFIX = path.join(CACHE_ROOT, "npm-prefix")
 const REACT_VERSION = "18.3.1"
 const packageLocks = new Map<string, Promise<string>>()
 const bundleLocks = new Map<string, Promise<string>>()
@@ -71,12 +74,22 @@ const pathExists = async (target: string) => {
 
 const run = async (command: string, args: string[], cwd?: string) => {
 	try {
+		await Promise.all([
+			fs.mkdir(NPM_HOME, { recursive: true }),
+			fs.mkdir(NPM_CACHE, { recursive: true }),
+			fs.mkdir(NPM_PREFIX, { recursive: true }),
+		])
+
 		await execFile(command, args, {
 			cwd,
 			env: {
 				...process.env,
+				HOME: NPM_HOME,
+				npm_config_cache: NPM_CACHE,
+				npm_config_prefix: NPM_PREFIX,
 				npm_config_audit: "false",
 				npm_config_fund: "false",
+				npm_config_update_notifier: "false",
 			},
 			maxBuffer: 1024 * 1024 * 12,
 		})
