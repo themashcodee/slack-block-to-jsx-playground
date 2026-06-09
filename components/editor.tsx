@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from "react"
-import { Block, Message } from "slack-blocks-to-jsx"
+import type { Block } from "slack-blocks-to-jsx"
 import CodeEditor, { Monaco } from "@monaco-editor/react"
-import { ErrorBoundary } from "./error_boundary"
 import { ConfigEditor } from "./config_editor"
+import { LibraryPreview } from "./library_preview"
 import packageJson from "../package.json"
 import { images } from "@/images"
 import Image from "next/image"
@@ -15,6 +15,9 @@ import {
 	saveBlocks,
 } from "@/utils/config"
 const version = packageJson.dependencies["slack-blocks-to-jsx"].replace("^", "")
+const defaultLibrarySpec = `slack-blocks-to-jsx@${version}`
+const previewLibrarySpec = "https://pkg.pr.new/slack-blocks-to-jsx@74"
+const librarySpecStorageKey = "slack-playground-library-spec"
 
 const example: Block[] = [
 	{
@@ -461,9 +464,17 @@ export const Editor = () => {
 	const [code, setCode] = useState(JSON.stringify(blocks, null, 2))
 	const [config, setConfig] = useState<MessageConfig>(defaultConfig)
 	const [activeTab, setActiveTab] = useState<"blocks" | "config">("blocks")
+	const [librarySpecInput, setLibrarySpecInput] = useState(defaultLibrarySpec)
+	const [librarySpec, setLibrarySpec] = useState(defaultLibrarySpec)
 	const editorRef = useRef(null)
 
 	useEffect(() => {
+		const savedLibrarySpec = localStorage.getItem(librarySpecStorageKey)
+		if (savedLibrarySpec) {
+			setLibrarySpecInput(savedLibrarySpec)
+			setLibrarySpec(savedLibrarySpec)
+		}
+
 		const savedConfig = loadConfig()
 		if (savedConfig) {
 			setConfig(savedConfig)
@@ -484,8 +495,26 @@ export const Editor = () => {
 		saveBlocks(blocks)
 	}, [blocks])
 
+	useEffect(() => {
+		localStorage.setItem(librarySpecStorageKey, librarySpec)
+	}, [librarySpec])
+
 	const handleConfigChange = (newConfig: MessageConfig) => {
 		setConfig(newConfig)
+	}
+
+	const handleLibrarySpecSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault()
+		const nextSpec = librarySpecInput.trim()
+
+		if (nextSpec) {
+			setLibrarySpec(nextSpec)
+		}
+	}
+
+	const applyLibrarySpec = (nextSpec: string) => {
+		setLibrarySpecInput(nextSpec)
+		setLibrarySpec(nextSpec)
 	}
 
 	function handleEditorDidMount(editor: any, monaco: Monaco) {
@@ -573,6 +602,58 @@ export const Editor = () => {
 				<div className="w-full grid lg:grid-cols-12 grid-cols-1 gap-5">
 					{/* Editor Panel */}
 					<div className="lg:col-span-7 w-full flex flex-col gap-5">
+						<div className="ds-card p-4">
+							<form
+								onSubmit={handleLibrarySpecSubmit}
+								className="flex flex-col gap-3"
+							>
+								<div className="flex flex-col sm:flex-row sm:items-end gap-3">
+									<div className="flex-1 min-w-0">
+										<label className="ds-label block mb-1.5">
+											Library package
+										</label>
+										<input
+											type="text"
+											value={librarySpecInput}
+											onChange={(event) =>
+												setLibrarySpecInput(event.target.value)
+											}
+											className="ds-input font-mono text-ds-xs"
+											placeholder={previewLibrarySpec}
+											spellCheck={false}
+										/>
+									</div>
+									<button type="submit" className="ds-btn ds-btn-primary">
+										Load build
+									</button>
+								</div>
+
+								<div className="flex flex-wrap items-center gap-2">
+									<button
+										type="button"
+										onClick={() => applyLibrarySpec(defaultLibrarySpec)}
+										className="ds-btn ds-btn-ghost"
+									>
+										Bundled v{version}
+									</button>
+									<button
+										type="button"
+										onClick={() => applyLibrarySpec("slack-blocks-to-jsx@latest")}
+										className="ds-btn ds-btn-ghost"
+									>
+										Latest npm
+									</button>
+									<button
+										type="button"
+										onClick={() => applyLibrarySpec(previewLibrarySpec)}
+										className="ds-btn ds-btn-ghost"
+									>
+										pkg.pr #74
+									</button>
+								</div>
+							</form>
+						</div>
+
 						<div
 							className="ds-card overflow-hidden flex flex-col"
 							style={{ height: 600 }}
@@ -707,66 +788,11 @@ export const Editor = () => {
 							</div>
 							<hr className="ds-divider mb-4" />
 							<div className="overflow-auto">
-								<ErrorBoundary
-									fallback={
-										<div className="w-full h-full flex items-center justify-center p-6">
-											<p className="text-ds-text-secondary text-ds-sm">
-												Your blocks JSON might be invalid.{" "}
-												<a
-													target="_blank"
-													rel="noreferrer"
-													className="text-ds-accent-text hover:underline"
-													href={`https://app.slack.com/block-kit-builder#${JSON.stringify(
-														{ blocks },
-													)}`}
-												>
-													Validate on Slack Block Kit Builder
-												</a>
-											</p>
-										</div>
-									}
-								>
-									<Message
-										key={`message-${
-											config.enableCustomUserHook ? "with-hooks" : "no-hooks"
-										}`}
-										logo={config.logo}
-										name={config.name}
-										time={config.time || undefined}
-										showBlockKitDebug={config.showBlockKitDebug}
-										blocks={blocks}
-										unstyled={config.unstyled}
-										withoutWrapper={config.withoutWrapper}
-										data={config.data}
-										theme={config.theme}
-										hooks={
-											config.enableCustomUserHook
-												? {
-														user(data) {
-															return (
-																<button
-																	style={{
-																		background: "var(--ds-accent)",
-																		color: "var(--ds-text-inverse)",
-																		padding: "2px 8px",
-																		borderRadius: "var(--ds-radius-sm)",
-																		fontSize: "var(--ds-text-sm)",
-																	}}
-																	onClick={() => {
-																		alert(
-																			"Guess what, we support custom wrappers",
-																		)
-																	}}
-																>
-																	@{data.name} (custom)
-																</button>
-															)
-														},
-													}
-												: undefined
-										}
-									/>
-								</ErrorBoundary>
+								<LibraryPreview
+									blocks={blocks}
+									config={config}
+									librarySpec={librarySpec}
+								/>
 							</div>
 						</div>
 					</div>
