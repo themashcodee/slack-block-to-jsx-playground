@@ -17,7 +17,8 @@
     "react-dom": "^18",
     "react-markdown": "9",
     "remark-gfm": "4",
-    "slack-blocks-to-jsx": "^1.0.6"
+    "slack-blocks-to-jsx": "^1.0.6",
+    "tar": "^7.5.16"
   },
   "devDependencies": {
     "@types/node": "^20",

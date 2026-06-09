@@ -124,7 +124,11 @@ const ensurePackage = async (spec: string, cacheDir: string) => {
 	await run("npm", ["pack", spec, "--pack-destination", cacheDir])
 
 	const tarball = await findTarball(cacheDir)
-	await run("tar", ["-xzf", tarball, "-C", cacheDir])
+	const tar = require("tar") as typeof import("tar")
+	await tar.x({
+		file: tarball,
+		cwd: cacheDir,
+	})
 
 	if (!(await pathExists(packageJsonPath))) {
 		throw new Error("Package tarball did not contain package.json")
