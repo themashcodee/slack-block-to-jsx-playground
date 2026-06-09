@@ -1,247 +1,185 @@
-import { createHash } from "crypto"
-import { promises as fs } from "fs"
-import os from "os"
-import path from "path"
-import { promisify } from "util"
-import { execFile as execFileCallback } from "child_process"
 import type { NextApiRequest, NextApiResponse } from "next"
+import zlib from "zlib"
 
-const execFile = promisify(execFileCallback)
-
-const CACHE_ROOT = path.join(os.tmpdir(), "slack-blocks-to-jsx-playground")
-const NPM_HOME = path.join(CACHE_ROOT, "home")
-const NPM_CACHE = path.join(CACHE_ROOT, "npm-cache")
-const NPM_PREFIX = path.join(CACHE_ROOT, "npm-prefix")
-const REACT_VERSION = "18.3.1"
-const packageLocks = new Map<string, Promise<string>>()
-const bundleLocks = new Map<string, Promise<string>>()
+/**
+ * Serves prebuilt `slack-blocks-to-jsx` builds that npm CDNs cannot resolve —
+ * namely https://pkg.pr.new/... continuous-release tarballs tied to a PR/commit.
+ *
+ * Published versions (e.g. `slack-blocks-to-jsx@1.0.6`, `@latest`, dist tags)
+ * are NOT handled here: the client loads those straight from esm.sh / jsDelivr.
+ *
+ * For pkg.pr.new we fetch the tarball and serve its raw, already-built
+ * `dist/index.mjs` and `dist/style.css`. We deliberately do NOT bundle the
+ * library's dependencies (node-emoji, react-markdown, remark-gfm, react): the
+ * built file imports them as bare specifiers, and the preview iframe resolves
+ * those through an import map pointing at esm.sh. That keeps this route free of
+ * `npm install` / esbuild, which do not work reliably inside a serverless
+ * function.
+ */
 
 type BundleType = "module" | "css"
 
-const normalizeSpec = (value: unknown): string => {
-	const raw = Array.isArray(value) ? value[0] : value
-	const spec = String(raw || "")
-		.trim()
-		.replace(/^npm\s+(?:i|install)\s+/i, "")
+const PACKAGE_NAME = "slack-blocks-to-jsx"
+const CACHE_TTL_MS = 5 * 60 * 1000
 
-	if (!spec) {
-		return "slack-blocks-to-jsx@latest"
-	}
-
-	if (spec.length > 300) {
-		throw new Error("Package spec is too long")
-	}
-
-	if (spec.startsWith("https://pkg.pr.new/slack-blocks-to-jsx@")) {
-		return spec
-	}
-
-	if (spec === "slack-blocks-to-jsx") {
-		return spec
-	}
-
-	if (spec.startsWith("slack-blocks-to-jsx@")) {
-		return spec
-	}
-
-	if (/^[A-Za-z0-9._-]+$/.test(spec)) {
-		return `slack-blocks-to-jsx@${spec}`
-	}
-
-	throw new Error(
-		"Use slack-blocks-to-jsx@version, a dist tag, or a https://pkg.pr.new/slack-blocks-to-jsx@... URL",
-	)
+type CachedBuild = {
+	expires: number
+	module: string
+	css: string
 }
+
+const buildCache = new Map<string, CachedBuild>()
+const inflight = new Map<string, Promise<CachedBuild>>()
 
 const getBundleType = (value: unknown): BundleType => {
 	const raw = Array.isArray(value) ? value[0] : value
 	return raw === "css" ? "css" : "module"
 }
 
-const getCacheDir = (spec: string) => {
-	const hash = createHash("sha256").update(spec).digest("hex").slice(0, 20)
-	return path.join(CACHE_ROOT, hash)
-}
+const resolvePkgPrNewUrl = (value: unknown): string => {
+	const raw = Array.isArray(value) ? value[0] : value
+	const spec = String(raw || "")
+		.trim()
+		.replace(/^npm\s+(?:i|install)\s+/i, "")
 
-const pathExists = async (target: string) => {
+	if (!spec) {
+		throw new Error("Missing package spec")
+	}
+
+	if (spec.length > 300) {
+		throw new Error("Package spec is too long")
+	}
+
+	let url: URL
 	try {
-		await fs.access(target)
-		return true
+		url = new URL(spec)
 	} catch {
-		return false
+		throw new Error(
+			"This endpoint only serves https://pkg.pr.new/... builds. Published versions load directly from a CDN.",
+		)
 	}
+
+	if (url.protocol !== "https:" || url.hostname !== "pkg.pr.new") {
+		throw new Error(
+			"This endpoint only serves https://pkg.pr.new/... builds. Published versions load directly from a CDN.",
+		)
+	}
+
+	if (!url.pathname.includes(PACKAGE_NAME)) {
+		throw new Error(`Only ${PACKAGE_NAME} builds are allowed`)
+	}
+
+	return url.toString()
 }
 
-const run = async (command: string, args: string[], cwd?: string) => {
-	try {
-		await Promise.all([
-			fs.mkdir(NPM_HOME, { recursive: true }),
-			fs.mkdir(NPM_CACHE, { recursive: true }),
-			fs.mkdir(NPM_PREFIX, { recursive: true }),
-		])
-
-		await execFile(command, args, {
-			cwd,
-			env: {
-				...process.env,
-				HOME: NPM_HOME,
-				npm_config_cache: NPM_CACHE,
-				npm_config_prefix: NPM_PREFIX,
-				npm_config_audit: "false",
-				npm_config_fund: "false",
-				npm_config_update_notifier: "false",
-			},
-			maxBuffer: 1024 * 1024 * 12,
-		})
-	} catch (error) {
-		const message =
-			error instanceof Error ? error.message : "Unknown package command error"
-		throw new Error(message)
-	}
+const readOctal = (buf: Buffer): number => {
+	const text = buf.toString("latin1").replace(/\0.*$/, "").trim()
+	return text ? parseInt(text, 8) : 0
 }
 
-const findTarball = async (dir: string) => {
-	const entries = await fs.readdir(dir)
-	const tarball = entries.find((entry) => entry.endsWith(".tgz"))
+// Minimal, dependency-free tar reader for npm pack tarballs (ustar format,
+// short paths). Returns a map of in-package paths (the leading `package/` is
+// stripped) to their raw contents.
+const extractTarGz = (gz: Buffer): Map<string, Buffer> => {
+	const tar = zlib.gunzipSync(gz)
+	const files = new Map<string, Buffer>()
+	let offset = 0
 
-	if (!tarball) {
-		throw new Error("npm pack did not produce a tarball")
+	while (offset + 512 <= tar.length) {
+		const header = tar.subarray(offset, offset + 512)
+		if (header.every((byte) => byte === 0)) break
+
+		let name = header.subarray(0, 100).toString("latin1").replace(/\0.*$/, "")
+		const prefix = header
+			.subarray(345, 500)
+			.toString("latin1")
+			.replace(/\0.*$/, "")
+		if (prefix) name = `${prefix}/${name}`
+
+		const size = readOctal(header.subarray(124, 136))
+		const typeflag = String.fromCharCode(header[156])
+		const dataStart = offset + 512
+
+		// Only regular files ("0", legacy "\0", or empty typeflag).
+		if (name && (typeflag === "0" || typeflag === "\0" || typeflag === "")) {
+			const data = tar.subarray(dataStart, dataStart + size)
+			files.set(name.replace(/^package\//, ""), Buffer.from(data))
+		}
+
+		offset = dataStart + Math.ceil(size / 512) * 512
 	}
 
-	return path.join(dir, tarball)
+	return files
 }
 
-const ensurePackage = async (spec: string, cacheDir: string) => {
-	const packageDir = path.join(cacheDir, "package")
-	const packageJsonPath = path.join(packageDir, "package.json")
-
-	if (await pathExists(packageJsonPath)) {
-		return packageDir
+const loadBuild = async (tarballUrl: string): Promise<CachedBuild> => {
+	const response = await fetch(tarballUrl)
+	if (!response.ok) {
+		throw new Error(`Could not download build (HTTP ${response.status})`)
 	}
 
-	await fs.rm(cacheDir, { force: true, recursive: true })
-	await fs.mkdir(cacheDir, { recursive: true })
-	await run("npm", ["pack", spec, "--pack-destination", cacheDir])
+	const files = extractTarGz(Buffer.from(await response.arrayBuffer()))
 
-	const tarball = await findTarball(cacheDir)
-	const tar = require("tar") as typeof import("tar")
-	await tar.x({
-		file: tarball,
-		cwd: cacheDir,
-	})
-
-	if (!(await pathExists(packageJsonPath))) {
-		throw new Error("Package tarball did not contain package.json")
+	const packageJsonRaw = files.get("package.json")
+	if (!packageJsonRaw) {
+		throw new Error("Build tarball is missing package.json")
 	}
 
-	await run("npm", [
-		"install",
-		"--omit=dev",
-		"--ignore-scripts",
-		"--no-audit",
-		"--no-fund",
-	], packageDir)
-
-	return packageDir
-}
-
-const ensurePackageWithLock = async (spec: string, cacheDir: string) => {
-	const existing = packageLocks.get(cacheDir)
-	if (existing) {
-		return existing
-	}
-
-	const pending = ensurePackage(spec, cacheDir).finally(() => {
-		packageLocks.delete(cacheDir)
-	})
-	packageLocks.set(cacheDir, pending)
-	return pending
-}
-
-const readPackageJson = async (packageDir: string) => {
-	const packageJson = JSON.parse(
-		await fs.readFile(path.join(packageDir, "package.json"), "utf8"),
-	)
-
-	if (packageJson.name !== "slack-blocks-to-jsx") {
-		throw new Error("Resolved package is not slack-blocks-to-jsx")
-	}
-
-	return packageJson as {
-		main?: string
+	const packageJson = JSON.parse(packageJsonRaw.toString("utf8")) as {
+		name?: string
 		module?: string
-		version?: string
+		main?: string
+	}
+
+	if (packageJson.name !== PACKAGE_NAME) {
+		throw new Error("Resolved build is not slack-blocks-to-jsx")
+	}
+
+	const entry = packageJson.module || packageJson.main || "dist/index.mjs"
+	const moduleBuffer = files.get(entry)
+	if (!moduleBuffer) {
+		throw new Error("Build does not expose a module entry")
+	}
+
+	const cssBuffer = files.get("dist/style.css")
+
+	// The prebuilt bundle leaves `process.env.NODE_ENV` for the consumer's
+	// bundler to define (esm.sh inlines it for published versions). Since we
+	// serve the file straight to the browser, inline it the same way so the
+	// module does not throw `ReferenceError: process is not defined`.
+	const moduleCode = moduleBuffer
+		.toString("utf8")
+		.replace(/process\.env\.NODE_ENV/g, '"production"')
+
+	return {
+		expires: Date.now() + CACHE_TTL_MS,
+		module: moduleCode,
+		css: cssBuffer ? cssBuffer.toString("utf8") : "",
 	}
 }
 
-const ensureModuleBundle = async (packageDir: string, cacheDir: string) => {
-	const bundlePath = path.join(cacheDir, "bundle.mjs")
-
-	if (await pathExists(bundlePath)) {
-		return bundlePath
+const getBuild = async (tarballUrl: string): Promise<CachedBuild> => {
+	const cached = buildCache.get(tarballUrl)
+	if (cached && cached.expires > Date.now()) {
+		return cached
 	}
 
-	const esbuild = require("esbuild") as typeof import("esbuild")
-	const packageJson = await readPackageJson(packageDir)
-	const entry = path.join(
-		packageDir,
-		packageJson.module || packageJson.main || "dist/index.mjs",
-	)
-
-	if (!(await pathExists(entry))) {
-		throw new Error("Resolved package does not expose a module entry")
-	}
-
-	await esbuild.build({
-		entryPoints: [entry],
-		bundle: true,
-		format: "esm",
-		outfile: bundlePath,
-		platform: "browser",
-		target: "es2020",
-		plugins: [
-			{
-				name: "react-cdn",
-				setup(build) {
-					const reactModules: Record<string, string> = {
-						react: `https://esm.sh/react@${REACT_VERSION}`,
-						"react/jsx-runtime": `https://esm.sh/react@${REACT_VERSION}/jsx-runtime`,
-					}
-
-					build.onResolve(
-						{ filter: /^(react|react\/jsx-runtime)$/ },
-						(args) => ({
-							path: reactModules[args.path],
-							external: true,
-						}),
-					)
-				},
-			},
-		],
-	})
-
-	return bundlePath
-}
-
-const ensureModuleBundleWithLock = async (
-	packageDir: string,
-	cacheDir: string,
-) => {
-	const existing = bundleLocks.get(cacheDir)
+	const existing = inflight.get(tarballUrl)
 	if (existing) {
 		return existing
 	}
 
-	const pending = ensureModuleBundle(packageDir, cacheDir).finally(() => {
-		bundleLocks.delete(cacheDir)
-	})
-	bundleLocks.set(cacheDir, pending)
-	return pending
-}
+	const pending = loadBuild(tarballUrl)
+		.then((result) => {
+			buildCache.set(tarballUrl, result)
+			return result
+		})
+		.finally(() => {
+			inflight.delete(tarballUrl)
+		})
 
-const getCssPath = async (packageDir: string) => {
-	const cssPath = path.join(packageDir, "dist", "style.css")
-	return (await pathExists(cssPath)) ? cssPath : null
+	inflight.set(tarballUrl, pending)
+	return pending
 }
 
 export default async function handler(
@@ -252,31 +190,28 @@ export default async function handler(
 
 	if (req.method !== "GET") {
 		res.setHeader("Allow", "GET")
-		res.status(405).send("Method not allowed")
+		res.status(405).json({ error: "Method not allowed" })
 		return
 	}
 
 	try {
-		const spec = normalizeSpec(req.query.spec)
 		const type = getBundleType(req.query.type)
-		const cacheDir = getCacheDir(spec)
-		const packageDir = await ensurePackageWithLock(spec, cacheDir)
+		const tarballUrl = resolvePkgPrNewUrl(req.query.spec)
+		const build = await getBuild(tarballUrl)
 
 		if (type === "css") {
-			const cssPath = await getCssPath(packageDir)
 			res.setHeader("Content-Type", "text/css; charset=utf-8")
-			res.setHeader("Cache-Control", "public, max-age=3600")
-			res.send(cssPath ? await fs.readFile(cssPath, "utf8") : "")
+			res.setHeader("Cache-Control", "public, max-age=300")
+			res.send(build.css)
 			return
 		}
 
-		const bundlePath = await ensureModuleBundleWithLock(packageDir, cacheDir)
 		res.setHeader("Content-Type", "application/javascript; charset=utf-8")
-		res.setHeader("Cache-Control", "public, max-age=3600")
-		res.send(await fs.readFile(bundlePath, "utf8"))
+		res.setHeader("Cache-Control", "public, max-age=300")
+		res.send(build.module)
 	} catch (error) {
 		const message =
-			error instanceof Error ? error.message : "Unable to load package"
+			error instanceof Error ? error.message : "Unable to load build"
 		res.status(400).json({ error: message })
 	}
 }

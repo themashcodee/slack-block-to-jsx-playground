@@ -22,10 +22,40 @@ const serializeConfig = (config: MessageConfig) => ({
 	time: config.time ? config.time.toISOString() : null,
 })
 
+const PACKAGE_NAME = "slack-blocks-to-jsx"
+
+// Published versions load straight from esm.sh / jsDelivr (no server hop);
+// pkg.pr.new builds go through /api/library-bundle, which serves the prebuilt
+// tarball. Either way the module imports its deps (react, react-dom, node-emoji,
+// react-markdown, remark-gfm) as bare specifiers that the iframe import map
+// resolves, so a single React instance is shared with the preview renderer.
+const resolveLibrarySource = (rawSpec: string) => {
+	const spec = rawSpec.trim().replace(/^npm\s+(?:i|install)\s+/i, "")
+
+	if (/^https:\/\/pkg\.pr\.new\//i.test(spec)) {
+		const encoded = encodeURIComponent(spec)
+		return {
+			moduleUrl: `/api/library-bundle?type=module&spec=${encoded}`,
+			cssUrl: `/api/library-bundle?type=css&spec=${encoded}`,
+		}
+	}
+
+	let version = "latest"
+	if (spec.startsWith(`${PACKAGE_NAME}@`)) {
+		version = spec.slice(PACKAGE_NAME.length + 1) || "latest"
+	} else if (spec && spec !== PACKAGE_NAME && !spec.includes("/")) {
+		version = spec
+	}
+
+	const encodedVersion = encodeURIComponent(version)
+	return {
+		moduleUrl: `https://esm.sh/${PACKAGE_NAME}@${encodedVersion}?external=react,react-dom&target=es2022`,
+		cssUrl: `https://cdn.jsdelivr.net/npm/${PACKAGE_NAME}@${encodedVersion}/dist/style.css`,
+	}
+}
+
 const createPreviewHtml = (librarySpec: string, payload: unknown) => {
-	const encodedSpec = encodeURIComponent(librarySpec)
-	const moduleUrl = `/api/library-bundle?type=module&spec=${encodedSpec}`
-	const cssUrl = `/api/library-bundle?type=css&spec=${encodedSpec}`
+	const { moduleUrl, cssUrl } = resolveLibrarySource(librarySpec)
 	const payloadJson = escapeForScript(payload)
 	const librarySpecJson = escapeForScript(librarySpec)
 
@@ -68,7 +98,10 @@ const createPreviewHtml = (librarySpec: string, payload: unknown) => {
 					"react": "https://esm.sh/react@18.3.1",
 					"react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
 					"react-dom": "https://esm.sh/react-dom@18.3.1?external=react",
-					"react-dom/client": "https://esm.sh/react-dom@18.3.1/client?external=react"
+					"react-dom/client": "https://esm.sh/react-dom@18.3.1/client?external=react",
+					"node-emoji": "https://esm.sh/node-emoji@2",
+					"react-markdown": "https://esm.sh/react-markdown@9?external=react",
+					"remark-gfm": "https://esm.sh/remark-gfm@4"
 				}
 			}
 		</script>
@@ -206,7 +239,21 @@ const createPreviewHtml = (librarySpec: string, payload: unknown) => {
 				renderPreview = render;
 				render(payload);
 			} catch (error) {
-				showError(error);
+				let detail = error instanceof Error ? error.message : String(error);
+
+				try {
+					const response = await fetch("${moduleUrl}");
+					if (!response.ok) {
+						const body = await response.text();
+						try {
+							detail = JSON.parse(body).error || detail;
+						} catch (parseError) {
+							if (body) detail = body;
+						}
+					}
+				} catch (fetchError) {}
+
+				showError(new Error(detail));
 			}
 		</script>
 	</body>
